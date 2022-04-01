@@ -1,0 +1,63 @@
+#root {
+    height: 100%;
+    min-height: 800px;
+}
+
+.wrapper {
+    height: 100%;
+    display: flex;
+    flex-flow: column nowrap;
+    padding: 20px;
+}
+
+.bottom-content {
+    flex: 1;
+    margin-top: 30px;
+    position: relative;
+}
+
+.page-wrap {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    text-align: center;
+}
+
+.flex {
+    display: flex;
+}
+
+.flex-center-y {
+    align-items: center;
+}
+
+.alert-custom {
+    width: 200px;
+}
+
+.image-container {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 50px;
+    top: 0;
+    overflow: auto;
+}
+
+.image-list {
+    $width: 160px;
+    $height: 90px;
+
+    display: grid;
+    justify-content: space-between;
+    grid-template-columns: repeat(auto-fill, $width);
+    gap: 10px;
+
+    .snapshot {
+        object-fit: cover;
+
+        height: $height;
+        width: $width;
+    }
+}
