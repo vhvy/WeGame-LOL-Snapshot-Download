@@ -32,6 +32,10 @@
     align-items: center;
 }
 
+.flex-between {
+    justify-content: space-between;
+}
+
 .alert-custom {
     width: 200px;
 }
@@ -46,13 +50,15 @@
 }
 
 .image-list {
-    $width: 160px;
-    $height: 90px;
+    $width: 200px;
+    $height: 112px;
 
     display: grid;
     justify-content: space-between;
     grid-template-columns: repeat(auto-fill, $width);
     gap: 10px;
+
+
 
     .snapshot {
         object-fit: cover;
@@ -60,4 +66,8 @@
         height: $height;
         width: $width;
     }
+}
+
+.snapshot-info {
+    margin-top: 5px;
 }
