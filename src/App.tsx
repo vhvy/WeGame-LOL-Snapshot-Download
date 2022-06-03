@@ -18,6 +18,7 @@ function App() {
   const { page, pageSize, setPage, setPageSize } = usePage();
 
 
+  
   const [isLoading, setLoading] = useState(false);
 
   const [total, setTotal] = useState(0);
@@ -149,8 +150,10 @@ function App() {
 
 
 
-  const handleDownload = () => {
-    startDownloadImage(list);
+  const handleDownload = async () => {
+    if (isLoading) return;
+    await startDownloadImage(list);
+    setLoading(false);
   }
 
   return (

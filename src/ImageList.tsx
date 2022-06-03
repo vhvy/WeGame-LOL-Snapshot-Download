@@ -1,5 +1,5 @@
 import React from "react";
-import { ImageData } from "@/App";
+import { ImageData } from "@/utils/index";
 import { Image, Tag } from "antd";
 
 interface Props {

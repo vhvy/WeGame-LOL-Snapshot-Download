@@ -1,6 +1,12 @@
 const { app, BrowserWindow } = require('electron');
 const { session } = require("electron");
+const path = require("path");
 let win;
+
+const isDev = process.env.NODE_ENV === "development";
+
+const userAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.124 Safari/537.36 qblink wegame.exe WeGame/5.3.0.3250 QBCore/3.70.107.400 QQBrowser/9.0.2524.400";
+
 const createWindow = () => {
     win = new BrowserWindow({
         width: 1920,
@@ -10,10 +16,19 @@ const createWindow = () => {
         }
     });
 
-    win.loadURL("http://localhost:3000", {
-        userAgent: "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.124 Safari/537.36 qblink wegame.exe WeGame/5.3.0.3250 QBCore/3.70.107.400 QQBrowser/9.0.2524.400",
-    });
-    win.webContents.openDevTools();
+
+
+    if (isDev) {
+        win.loadURL("http://localhost:3000", {
+            userAgent,
+        });
+        win.webContents.openDevTools();
+    } else {
+        win.loadFile(path.resolve(__dirname, "dist/index.html"), {
+            userAgent
+        });
+    }
+
 }
 
 const filter = {
