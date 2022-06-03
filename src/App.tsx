@@ -4,7 +4,7 @@ import usePage from "@/hooks/usePage";
 import ImageList from '@/ImageList';
 import useModal from "@/hooks/useModal";
 import useArea from "@/hooks/useArea";
-import { downloadImg, downloadZipFile, ImgBlob } from "@/utils/index";
+import { downloadImg, downloadZipFile, ImgBlob, ImageData, getImages } from "@/utils/index";
 
 const { TextArea } = Input;
 const { Item } = Form;
@@ -12,14 +12,6 @@ const { Option } = Select;
 
 const COOKIE_KEY = "COOKIE_KEY";
 
-
-export interface ImageData {
-  id: string,
-  src: string,
-  time: string,
-  kill_count: number,
-  action_type: number
-};
 
 function App() {
 
@@ -68,14 +60,57 @@ function App() {
     setCookie(target.value);
   }
 
-  const getImgId = (src: string): string => {
-    const idx = src.lastIndexOf("/");
-    return src.slice(idx + 1);
-  }
-
   const handlePageChange = (_page: number, _pageSize: number) => {
     setPage(_page);
     setPageSize(_pageSize);
+  }
+
+  const startDownloadImage = async (list: ImageData[]) => {
+    let imgList = list.map(i => i.src);
+    const msg = message.loading("正在下载图片...", 0);
+    const blobs = await downloadImg(imgList);
+    msg();
+    const blobInfo: ImgBlob[] = blobs.map((blob, idx) => ({
+      blob,
+      name: list[idx].id + ".jpg"
+    }));
+
+    downloadZipFile(blobInfo);
+  }
+
+  const handleDownloadAllImage = async () => {
+    if (isLoading) return;
+    setLoading(true);
+
+    let page = 1;
+    let _total = 0;
+    const allImagesInfo: ImageData[] = [];
+
+    const getAllImagesInfo = async () => {
+      const { total, list } = await getImages(qq, areaId, page, 40);
+      if (list.length) {
+        _total = total;
+        allImagesInfo.push(...list);
+      }
+
+      if (allImagesInfo.length < total) {
+        page++;
+        await getAllImagesInfo();
+      }
+    }
+
+    try {
+      await getAllImagesInfo();
+      if (allImagesInfo.length === 0) {
+        message.info("当前大区没有任何荣誉截图!");
+      } else {
+        await startDownloadImage(allImagesInfo);
+      }
+    } catch (err: any) {
+      message.error(err.message);
+    }
+
+    setLoading(false);
   }
 
   const getData = async () => {
@@ -83,51 +118,16 @@ function App() {
     setLoading(true);
 
     try {
-      const response = await fetch("https://www.wegame.com.cn/api/v1/wegame.pallas.game.LolBattle/GetUserSnapshot", {
-        method: "POST",
-        body: JSON.stringify({
-          "account_type": 1,
-          "id": qq,
-          "area": areaId,
-          "action_type": 0,
-          "offset": page - 1,
-          "limit": pageSize,
-          "from_src": "lol_helper"
-        })
-      });
-
-
-      interface Image {
-        file_url: string,
-        commit_time: string,
-        killed_enemy_count: number,
-        action_type: number
-      };
-
-      const { total, result, snapshots } = await response.json();
-
-
-      if (result.error_code == 0) {
-        setTotal(total);
-        const list = snapshots.map((item: Image) => {
-          return {
-            id: getImgId(item.file_url),
-            src: item.file_url + "/0",
-            time: item.commit_time,
-            kill_count: item.killed_enemy_count,
-            action_type: item.action_type
-          };
-        });
-        setList(list);
-      } else {
-        message.error(result.error_message);
+      const { total, list } = await getImages(qq, areaId, page, pageSize);
+      if (total === 0) {
+        message.info("当前大区内没有任何荣誉截图!");
       }
-
-
+      setTotal(total);
+      setList(list);
       setLoading(false);
-    } catch (err) {
+    } catch (err: any) {
       console.log(err);
-
+      message.error(err.message);
       setLoading(false);
     }
   }
@@ -147,17 +147,10 @@ function App() {
     getData();
   }
 
-  const handleDownload = async () => {
-    let imgList = list.map(i => i.src);
-    const msg = message.loading("正在下载图片...", 0);
-    const blobs = await downloadImg(imgList);
-    msg();
-    const blobInfo: ImgBlob[] = blobs.map((blob, idx) => ({
-      blob,
-      name: list[idx].id + ".jpg"
-    }));
 
-    downloadZipFile(blobInfo);
+
+  const handleDownload = () => {
+    startDownloadImage(list);
   }
 
   return (
@@ -191,7 +184,8 @@ function App() {
           </Item>
 
           <Item label="操作">
-            <Button type="primary" onClick={handleDownload}>下载所有图片</Button>
+            <Button type="primary" style={{ marginRight: 20 }} onClick={handleDownload}>下载当前页面截图</Button>
+            <Button type="primary" onClick={handleDownloadAllImage}>下载所有截图</Button>
           </Item>
 
 
