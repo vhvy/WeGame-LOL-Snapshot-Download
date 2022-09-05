@@ -4,7 +4,7 @@ import usePage from "@/hooks/usePage";
 import ImageList from '@/ImageList';
 import useModal from "@/hooks/useModal";
 import useArea from "@/hooks/useArea";
-import { downloadImg, downloadZipFile, ImgBlob, ImageData, getImages } from "@/utils/index";
+import { downloadImg, downloadZipFile, ImgBlob, ImageData, getImages, getActionNameAndColor } from "@/utils/index";
 
 const { TextArea } = Input;
 const { Item } = Form;
@@ -18,7 +18,7 @@ function App() {
   const { page, pageSize, setPage, setPageSize } = usePage();
 
 
-  
+
   const [isLoading, setLoading] = useState(false);
 
   const [total, setTotal] = useState(0);
@@ -73,7 +73,7 @@ function App() {
     msg();
     const blobInfo: ImgBlob[] = blobs.map((blob, idx) => ({
       blob,
-      name: list[idx].id + ".jpg"
+      name: list[idx].time + "_" + getActionNameAndColor(list[idx]).name + list[idx].id + ".jpg"
     }));
 
     downloadZipFile(blobInfo);

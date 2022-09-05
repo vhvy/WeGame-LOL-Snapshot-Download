@@ -1,40 +1,14 @@
 import React from "react";
-import { ImageData } from "@/utils/index";
+import { ImageData, getActionNameAndColor } from "@/utils/index";
 import { Image, Tag } from "antd";
 
 interface Props {
     list: ImageData[]
 }
 
-
-enum ActionType {
-    Kill = 103,
-    QuadraKill = 104,
-    PentaKill = 105,
-    Legendary = 208,
-}
-
 const getKillTag = (item: ImageData) => {
-    let content: string;
-    let color = "blue";
-    switch (item.action_type) {
-        case ActionType.QuadraKill:
-            content = "四杀";
-            color = "#87d068";
-            break;
-        case ActionType.PentaKill:
-            content = "五杀";
-            color = "#f50";
-            break;
-        case ActionType.Legendary:
-            content = item.kill_count + "连杀";
-            color = "#2db7f5";
-            break;
-        case ActionType.Kill:
-        default:
-            content = item.kill_count + "杀";
-            break;
-    }
+
+    const { color, name: content } = getActionNameAndColor(item);
 
     return (
         <Tag style={{ marginRight: 0 }} color={color}>

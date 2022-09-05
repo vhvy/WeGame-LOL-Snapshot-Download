@@ -34,6 +34,45 @@ interface ImageResponse {
     total: number
 };
 
+export enum ActionType {
+    Kill = 103,
+    QuadraKill = 104,
+    PentaKill = 105,
+    Legendary = 208,
+}
+
+interface ActionNameAndColor {
+    name: string,
+    color: string
+}
+
+export const getActionNameAndColor = (item: ImageData): ActionNameAndColor => {
+    switch (item.action_type) {
+        case ActionType.QuadraKill:
+            return {
+                name: "四杀",
+                color: "#87d068"
+            };
+        case ActionType.PentaKill:
+            return {
+                name: "五杀",
+                color: "#f50"
+            };
+        case ActionType.Legendary:
+            return {
+                name: item.kill_count + "连杀",
+                color: "2db7f5"
+            };
+        case ActionType.Kill:
+        default:
+            return {
+                name: item.kill_count + "杀",
+                color: "blue"
+            };
+    }
+}
+
+
 export const getImages = async (
     qq: string,
     areaId: number,
@@ -106,7 +145,7 @@ export const downloadZipFile = async (list: ImgBlob[]) => {
             const anchor = document.createElement("a");
             const clickEvent = new MouseEvent("click");
             anchor.href = blobURL;
-            anchor.download = "图包合集" + Date.now();
+            anchor.download = "图包合集" + new Date().toLocaleString();
             anchor.dispatchEvent(clickEvent);
         }
 
