@@ -123,7 +123,7 @@ export const downloadImg = async (list: string[]) => {
 export const downloadZipFile = async (list: ImgBlob[]) => {
 
     const msg = message.loading("正在生成压缩包...", 0);
-    let zipWriter: zip.ZipWriter | null = new zip.ZipWriter(new zip.Data64URIWriter("application/zip"));
+    let zipWriter = new zip.ZipWriter(new zip.Data64URIWriter("application/zip"));
 
 
     let blobURL;
@@ -133,11 +133,10 @@ export const downloadZipFile = async (list: ImgBlob[]) => {
         }
 
         blobURL = await zipWriter.close(new Uint8Array, {
-            onprogress: (v) => {
-                console.log(v);
-            }
+            // onprogress: (v) => {
+            //     console.log(v);
+            // }
         });
-        zipWriter = null;
         msg();
         message.success("压缩包生成成功，稍后下载将开始...");
 
